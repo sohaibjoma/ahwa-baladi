@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>قهوة بلدي · Ahwa Baladi</title>
+  <rect x="2.5" y="2.5" width="59" height="59" rx="15" fill="#f59e0b" stroke="#1e130c" stroke-width="5"/>
+  <path d="M19 13h26c-.8 8.5-6 12.5-6 18 0 4.6 5 7.6 5 13.4 0 3.2-1.4 6.6-1.4 6.6H21.4S20 47.6 20 44.4c0-5.8 5-8.8 5-13.4 0-5.5-5.2-9.5-6-18z" fill="#fdf8ee" stroke="#1e130c" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M23.3 22h17.4c-1.5 3.8-4.2 6-4.2 9 0 4.4 5 7.2 5 12.6 0 1.8-.6 3.6-.6 3.6H23.1s-.6-1.8-.6-3.6c0-5.4 5-8.2 5-12.6 0-3-2.7-5.2-4.2-9z" fill="#9a3c14"/>
+  <path d="M27 9.5c-1.5-2 1.5-3.5 0-5.5M37 9.5c-1.5-2 1.5-3.5 0-5.5" fill="none" stroke="#1e130c" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

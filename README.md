@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# قهوة بلدي: فتلة ولا كشري؟ · Ahwa Baladi: Fatla Wala Koshary?
 
-## Getting Started
+An Egyptian street-cafe tea studio, mood oracle and decision maker. Build your glass on a brass tray, let the Ma'allem pick for you, steep it with a coach, and settle the bill with a retro receipt. Bilingual: Egyptian Arabic (default, RTL) and English (LTR).
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Next.js 16 (App Router, Cache Components) · React 19 · TypeScript · Tailwind CSS 4 · framer-motion (LazyMotion) · lucide-react · Biome.
+
+## Scripts
+
+| Command             | What it does                                                     |
+| ------------------- | ---------------------------------------------------------------- |
+| `npm run dev`       | Dev server on <http://localhost:3000>                            |
+| `npm run build`     | Production build (every page is prerendered)                     |
+| `npm start`         | Serve the production build                                       |
+| `npm run lint`      | Biome lint + format check                                        |
+| `npm run format`    | Biome: format, organize imports, apply safe fixes                |
+| `npm run typecheck` | Generate route types, then `tsc --noEmit`                        |
+| `npm run brand`     | Re-render the share cards, apple icon and favicon (needs Chrome) |
+
+## Structure
+
+```text
+src/
+  app/
+    [locale]/layout.tsx    root layout: fonts, <html lang dir>, metadata, JSON-LD, providers
+    [locale]/page.tsx      the page (Server Component composing the sections)
+    global-not-found.tsx   bilingual 404 for unknown URLs and locales
+    sitemap.ts robots.ts manifest.ts icon.svg apple-icon.png favicon.ico globals.css
+  components/              one file per section; TeaStudio is the client island that owns the tea order
+  data/tea.ts              domain: options, default order, quiz answers and their effects, tea colours
+  i18n/
+    config.ts              locale registry (lang tag, direction, URL path, OG locale, switcher label)
+    dictionary/ar.ts       Arabic copy; the source of the Dictionary type
+    dictionary/en.ts       English copy, type-checked against Arabic
+    LanguageProvider.tsx   active locale, dictionary and number helpers; instant switching
+    format.ts              ahwa shorthand for an order
+  lib/seo.ts               metadata, hreflang alternates, JSON-LD
+  lib/fonts.ts             Cairo, Marhey, Space Grotesk via next/font
+  utils/sound.ts           Web Audio synth: clink, pour, plop, slurp, bell (no audio files)
+scripts/brand-images.mjs   renders public/og/*.png, apple-icon.png and favicon.ico from icon.svg
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Languages
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Arabic lives at `/`, English at `/en`. Both are prerendered, so search engines index each language with its own title, description, canonical and hreflang links.
+- Switching language is instant: the provider swaps the dictionary in state (every component keeps its state), updates `<html lang dir>` and the title, and rewrites the URL with `history.replaceState`. The switcher items are real `<a hreflang>` links, so crawlers follow them.
+- Add copy to `dictionary/ar.ts` first; TypeScript then flags anything missing in `en.ts`. Arabic copy is Egyptian street Arabic, not Modern Standard Arabic.
+- Adding a locale: add it to `LOCALES` in `config.ts` and add its dictionary.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## SEO
 
-## Learn More
+- Per-locale metadata, `x-default`, Open Graph and Twitter cards, JSON-LD (`WebSite` + `WebApplication`), sitemap with hreflang alternates, robots, manifest and icons.
+- Set `NEXT_PUBLIC_SITE_URL` (see `.env.example`) so absolute URLs use the production domain; on Vercel the production domain is used automatically.
+- Share cards are static PNGs rendered by headless Chrome, because `next/og` cannot lay out Arabic text correctly. Run `npm run brand` after changing the brand copy or `icon.svg`.
 
-To learn more about Next.js, take a look at the following resources:
+## Decisions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **`/ar` redirects to `/` (308, cached by browsers).** The default locale is served from the root through a rewrite in `next.config.ts`. The redirect source is exact on purpose: a wildcard would also catch `/ar/...` asset routes.
+- **Unknown locales 404 statically** via `unstable_paramMatching` in the root layout, the Cache Components replacement for `dynamicParams = false`. It is still `unstable_` in Next 16.4, so re-check it when upgrading, together with `experimental.globalNotFound`.
+- **`ensureStatic = 'navigation'`** on the root layout makes the build fail if anything request-time slips into a page.
